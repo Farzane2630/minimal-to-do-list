@@ -13,7 +13,6 @@ export default function App() {
   const todos = useSelector(state => state.todo.todos)
   const status = useSelector(state => state.todo.status)
   const mainStatus = useSelector(state => state.todo.selectedCategory)
-  const changedTodo = useSelector(state => state.todo.updatedtodo)
 
 
   // generate todo
@@ -37,7 +36,7 @@ export default function App() {
     dispatch(removeTodo(todoID))
   }
 
-  // Filter todos
+  // changing the status of todos
 
   const changeStatus = (todoID) => {
     const newTodo = todos.map(todo => {
@@ -53,7 +52,7 @@ export default function App() {
 
   }
 
-
+  // filter todos
   const filterTodo = e => {
     dispatch(selectedCategory(e.target.value))
   }
