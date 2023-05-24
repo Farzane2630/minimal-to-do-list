@@ -2,35 +2,66 @@ import React, { useEffect, useState } from 'react'
 import './App.css'
 import Todo from './Todo'
 import { useDispatch, useSelector } from 'react-redux'
-import { addTodo, removeTodo } from './Redux/todo'
+import { addTodo, removeTodo, selectedCategory, updateTodos, updatedtodo } from './Redux/todo'
 import { v4 as uuidv4 } from 'uuid';
 
 export default function App() {
 
   const [inputValue, setInputValue] = useState("")
 
-  const todos = useSelector(state => state.todo.todos)
   const dispatch = useDispatch()
+  const todos = useSelector(state => state.todo.todos)
+  const status = useSelector(state => state.todo.status)
+  const mainStatus = useSelector(state => state.todo.selectedCategory)
+  const changedTodo = useSelector(state => state.todo.updatedtodo)
 
 
+  // generate todo
   const generateTodo = (e) => {
     setInputValue(e.target.value)
   }
 
+  //add todo
   const addTodoHandler = () => {
-    dispatch(addTodo({ id: uuidv4(), task: inputValue, status: 'UNCOMPLETED' }))
+    dispatch(addTodo({ id: uuidv4(), task: inputValue, status: 'Incompleted' }))
 
     setInputValue("")
   }
 
   const keyDown = e => {
-    console.log(e);
     e.code === "Enter" && addTodoHandler()
   }
 
+  // delete todo
   const deleteTask = (todoID) => {
     dispatch(removeTodo(todoID))
   }
+
+  // Filter todos
+
+  const changeStatus = (todoID) => {
+    const newTodo = todos.map(todo => {
+      if (todo.id === todoID && todo.status === "Incompleted") {
+        return { ...todo, status: "Completed" }
+      }
+      return todo;
+    })
+
+    dispatch(updatedtodo(todoID))
+
+    dispatch(updateTodos(newTodo))
+
+  }
+
+
+  const filterTodo = e => {
+    dispatch(selectedCategory(e.target.value))
+  }
+
+  const filteredTodos = mainStatus && mainStatus !== "All" ?
+    todos.filter(todo => todo.status === mainStatus) :
+    todos
+
 
   return (
     <div className='bg-slate-500 width-100 h-screen'
@@ -38,7 +69,16 @@ export default function App() {
       <div className="bg-[url('/src/assets/hero.jpg')] h-1/4">
         <h1 className='text-center text-slate-800 leading-10 text-5xl py-10 font-bold'>To-do List</h1>
       </div>
-      <div className="todos shadow-lg shadow-gray-700 rounded-none bg-white w-1/2 -mt-8 mx-auto py-6" onKeyDown={keyDown}>
+
+      <div className="todos shadow-lg shadow-gray-700 rounded-none bg-white w-1/2 mx-auto -mt-8 py-6" onKeyDown={keyDown}>
+
+        <div className="filter-categories flex flex-row items-center justify-center space-x-5 my-3">
+          {
+            status.map(term => (
+              <button key={uuidv4()} className={`rounded-full w-40 py-3 px-3 text-white ${term === 'All' ? "bg-gray-950/95" : term === 'Completed' ? "bg-green-950/95" : term === 'Incompleted' ? "bg-red-950/95" : ''} `} value={term} onClick={filterTodo}>{term}</button>
+            ))
+          }
+        </div>
         <div className="todo-generator flex flex-row items-center justify-center">
           <input type="text" className="border-0 rounded-full bg-[#323934] text-white h-10 w-1/2 px-5" onChange={generateTodo} />
           <button className="add-todo" onClick={addTodoHandler}>
@@ -79,8 +119,8 @@ export default function App() {
         <hr />
         <br />
         {
-          todos.length > 0 ? (
-            todos.map(todo => (
+          filteredTodos.length > 0 ? (
+            filteredTodos.map(todo => (
               <Todo
                 value={todo.task}
                 status={todo.status}

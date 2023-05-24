@@ -1,17 +1,17 @@
 import React from 'react'
 
-export default function Todo({ value, status, deleteTaskHandler, changeStatus }) {
+export default function Todo({ value, status, isCompleted, deleteTaskHandler, changeStatus }) {
 
    return (
-      <div 
-      className='flex flex-row items-center justify-center mb-3 hover:cursor-pointer'>
-         <div 
-         className="input-wrapper flex justify-center items-center text-white border-0 rounded-full font-semibold bg-slate-400 text-white h-10 w-1/2 px-5" 
-         onClick={changeStatus}
+      <div
+         className='flex flex-row items-center justify-center mb-3 hover:cursor-pointer'>
+         <div
+            className={`input-wrapper flex justify-center items-center text-white border-0 rounded-full font-semibold bg-slate-400 text-white h-10 w-1/2 px-5  ${status === "Completed" ? "line-through text-black decoration-inherit" : ""}`}
+            onClick={changeStatus}
          >
             {value}
          </div>
-         <button onClick={()=>deleteTaskHandler()}>
+         <button onClick={() => deleteTaskHandler()}>
             <svg
                xmlns="http://www.w3.org/2000/svg"
                width="40"
